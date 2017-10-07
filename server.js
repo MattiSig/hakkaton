@@ -4,6 +4,7 @@ var app     = express();
 var request = require('request');
 var path = require('path');
 var async = require('async');
+var bodyParser = require('body-parser');
 
 
 //define prefix for different units
@@ -15,9 +16,15 @@ var script = "";
 app.use(express.static(__dirname));
 var visits = 0;
 
+// IP 130.208.244.125
+// use bodyParser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+
 console.log("ljotur pafi");
 
-var vaccJ = [];
+
 var url = 'https://travelbriefing.org/'
 
 var countries = 'countries.json';
@@ -36,6 +43,10 @@ var q = async.queue(function (task, done) {
     });
 },5);
 
+function compareVaccines (userVaccines) {
+  // { 'userVaccines[]': [ 'Cholera', 'Hepatitis A', 'Malaria' ] }
+
+}
 
 request({
     url: url + countries,
@@ -52,10 +63,24 @@ request({
 
 });
 
-app.get('/', function(req,res){
-    console.log(req);
 
-    console.log(countriesJSON);
+app.post('/', function(req, res) {
+
+  try {
+    //console.log(req.body);
+    console.log(req.params);
+    console.log(req.body);
+  }
+  catch(e) {
+    console.error(e);
+  }
+
+  res.send(countriesJSON);
+});
+
+
+app.get('/', function(req,res){
+    console.log("Request!");
     res.send(countriesJSON);
 });
 
