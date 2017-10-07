@@ -3,6 +3,7 @@ var fs = require('fs');
 var app     = express();
 var request = require('request');
 var path = require('path');
+var async = require('async');
 
 
 //define prefix for different units
@@ -16,27 +17,43 @@ var visits = 0;
 
 console.log("ljotur pafi");
 
-var url = 'https://travelbriefing.org/countries.json';
+var vaccJ = [];
+var url = 'https://travelbriefing.org/'
 
-app.get('/', function(req,res){
-    console.log("Request!");
+var countries = 'countries.json';
 
-    request({
-    url: url,
+var counter = 0;
+var countriesJSON;
+request({
+    url: url + countries,
     json: true
     }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-            for (var i = body.length - 1; i >= 0; i--) {
-                console.log(body[i].name);
-            }
+        for (var i = 0; i <= body.length-1; i++) {
+            q.push({ url: body[i].url});
         }
-    });
-
-
-    res.send([{kaffi :"drasl"}]);
+    } else {
+        console.log(error);
+    }
 });
+var counter = 0;
+var q = async.queue(function (task, done) {
+    request(task.url, function(err, res, body) {
+        if (err) return done(err);
+        if (res.statusCode != 200) return done(res.statusCode);
 
-app.post
+        vaccJ[counter]= {name:body.names.name, vacc:body.vaccinations};
+        console.log(body.names.name);
+        counter++;
+        done();
+    });
+}, 1);
+
+app.get('/', function(req,res){
+    console.log("Request!");
+    console.log(vaccJ);
+    res.send(vaccJ);
+});
 
 
 app.listen('8282');
