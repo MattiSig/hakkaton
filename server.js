@@ -38,12 +38,15 @@ request({
 });
 var counter = 0;
 var q = async.queue(function (task, done) {
+    console.log(task.url);
     request(task.url, function(err, res, body) {
         if (err) return done(err);
         if (res.statusCode != 200) return done(res.statusCode);
-
-        vaccJ[counter]= {name:body.names.name, vacc:body.vaccinations};
+        if (!error && response.statusCode === 200) {
+            vaccJ[counter] = {name: body.names.name, vacc:body.vaccinations};
+        }
         console.log(body.names.name);
+        
         counter++;
         done();
     });
