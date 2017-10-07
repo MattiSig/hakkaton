@@ -45,7 +45,7 @@ var q = async.queue(function (task, done) {
 
 function compareVaccines (userVaccines) {
   // { 'userVaccines[]': [ 'Cholera', 'Hepatitis A', 'Malaria' ] }
-  
+
 }
 
 request({
@@ -62,6 +62,7 @@ request({
     }
 
 });
+
 
 app.post('/', function(req, res) {
 
