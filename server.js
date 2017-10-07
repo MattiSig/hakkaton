@@ -24,35 +24,39 @@ var countries = 'countries.json';
 
 var counter = 0;
 var countriesJSON;
+
+var q = async.queue(function (task, done) {
+    request(task.url, function(err, res, body) {
+        if (err) return done(err);
+        if (res.statusCode != 200) return done(res.statusCode);
+        //console.log(JSON.parse(body).vaccinations);
+        countriesJSON[counter] = {name: countriesJSON[counter].name, vaccinations:JSON.parse(body).vaccinations};
+        counter++;
+        done();
+    });
+},5);
+
+
 request({
     url: url + countries,
     json: true
     }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-        for (var i = 0; i <= body.length-1; i++) {
-            q.push({ url: body[i].url});
+        countriesJSON = body;
+        for (var i = 0; i <= countriesJSON.length -1; i++) {
+            q.push({ url: countriesJSON[i].url});
         }
     } else {
         console.log(error);
     }
-});
-var counter = 0;
-var q = async.queue(function (task, done) {
-    request(task.url, function(err, res, body) {
-        if (err) return done(err);
-        if (res.statusCode != 200) return done(res.statusCode);
 
-        vaccJ[counter]= {name:body.names.name, vacc:body.vaccinations};
-        console.log(body.names.name);
-        counter++;
-        done();
-    });
-}, 1);
+});
+
 
 app.get('/', function(req,res){
     console.log("Request!");
-    console.log(vaccJ);
-    res.send(vaccJ);
+    console.log(countriesJSON);
+    res.send(countriesJSON);
 });
 
 
