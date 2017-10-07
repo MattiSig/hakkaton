@@ -53,11 +53,11 @@ request({
 });
 
 app.get('/', function(req,res){
-    console.log("Request!");
+    console.log(req);
+
     console.log(countriesJSON);
     res.send(countriesJSON);
 });
-
 
 app.listen('8282');
 console.log('Magic happens on port 8282');
