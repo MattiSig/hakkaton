@@ -37,11 +37,11 @@ var q = async.queue(function (task, done) {
         if (err) return done(err);
         if (res.statusCode != 200) return done(res.statusCode);
         var vacc = JSON.parse(body).vaccinations;
-        var vaccNames = '';
+        var vaccNames = ''; 
         for(i = 0; i <= vacc.length -1; i++){
             vaccNames = vaccNames + " " + vacc[i].name;
         }
-        countriesJSON[counter] = {name: countriesJSON[counter].name, vaccinations: vacc, allVaccNames: vaccNames};
+        countriesJSON[counter] = {name: task.name, vaccinations: vacc, allVaccNames: vaccNames};
         counter++;
         console.log(counter);
         done();
@@ -61,28 +61,28 @@ function compareVaccines (userVaccines) {
             for(var j = 0; j <= userVaccines.length - 1; j++){    
                 if(vacc[k].name === userVaccines[j]){
                     bool = true;
-                    //break;
+                    break;
                 }
             }
             canTravel.push(bool);
         }
         var yesHeCan = true;
 
-        console.log(canTravel);
-        
+        console.log(countriesJSON[i].name + " : " + canTravel);
+
         for(var z = canTravel.length - 1; z >= 0; z--){
             if(!canTravel[z]){
                 if(yesHeCan) {
-                    listofCantGo.push({name:countriesJSON[i].name, needVacc:[vacc[z].name]});
+                    listofCantGo.push({name:countriesJSON[i].name, needVacc:[{name:vacc[z].name, description:vacc[z].message}]});
                     yesHeCan = false;
                 } else {
                     var refresh = listofCantGo.pop();
-                    refresh.needVacc.push(vacc[z].name)
+                    refresh.needVacc.push({name:vacc[z].name, description:vacc[z].message});
                     listofCantGo.push(refresh);
                 }
             }
         }
-        if(yesHeCan === true){ listOfCountires.push(countriesJSON[i].name)} 
+        if(yesHeCan === true){ listOfCountires.push({name: countriesJSON[i].name})} 
     }
     console.log(listofCantGo);
     return {can : listOfCountires, cant: listofCantGo};
@@ -95,7 +95,7 @@ request({
     if (!error && response.statusCode === 200) {
         countriesJSON = body;
         for (var i = 0; i <= countriesJSON.length -1; i++) {
-            q.push({ url: countriesJSON[i].url});
+            q.push({name:countriesJSON[i].name, url: countriesJSON[i].url});
         }
     } else {
         console.log(error);
